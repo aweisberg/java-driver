@@ -101,6 +101,8 @@ public class ProtocolOptions {
 
     private volatile Compression compression = Compression.NONE;
 
+    private volatile boolean allowServerPortDiscovery;
+
     /**
      * Creates a new {@code ProtocolOptions} instance using the {@code DEFAULT_PORT}
      * (and without SSL).
@@ -229,6 +231,22 @@ public class ProtocolOptions {
      */
     public AuthProvider getAuthProvider() {
         return authProvider;
+    }
+
+    /**
+     * True if this client should opt for ports published by the cluster rather than the port
+     * configured when the client was created.
+     * @return
+     */
+    public boolean getAllowServerPortDiscovery()
+    {
+        return allowServerPortDiscovery;
+    }
+
+    public ProtocolOptions setAllowServerPortDiscovery(boolean allowServerPortDiscovery)
+    {
+        this.allowServerPortDiscovery = allowServerPortDiscovery;
+        return this;
     }
 
 }
