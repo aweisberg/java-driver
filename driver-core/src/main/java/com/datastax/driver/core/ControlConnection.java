@@ -532,8 +532,6 @@ class ControlConnection implements Connection.Owner {
         // - rpc_port
         // - listen_port
 
-        System.out.println(row.getColumnDefinitions());
-        System.out.println(row);
         InetAddress broadcastAddress = null;
         Integer broadcastPort = null;
         if (row.getColumnDefinitions().contains("peer")) { // system.peers
