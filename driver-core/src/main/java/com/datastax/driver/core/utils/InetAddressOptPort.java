@@ -65,4 +65,11 @@ public class InetAddressOptPort {
         }
         return port;
     }
+
+    @Override
+    public String toString()
+    {
+        return port != null ? address.toString() + ":" + port : address.toString();
+    }
+
 }
