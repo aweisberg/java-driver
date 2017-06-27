@@ -382,6 +382,23 @@ class ControlConnection implements Connection.Owner {
         // same thing in a post Thrift world where there is just the native protocol.
 
         InetAddress broadcastAddress = peersRow.getInet("peer");
+        //Grab the port so we can assmemble socket addresses that aren't ambiguous
+        Integer rpcPort = cluster.configuration.getProtocolOptions().getPort();
+        if (peersRow.getColumnDefinitions().contains("rpc_port"))
+        {
+            rpcPort = peersRow.getInt("rpc_port");
+        } else if (peersRow.getColumnDefinitions().contains("native_port"))
+        {
+            rpcPort = peersRow.getInt("native_port");
+        }
+
+        //A fake address port combo that doesn't exist but will match with connectedHost when they are the same node
+        //for that weird DSE check below
+        InetSocketAddress broadcastSocketAddress = null;
+        if (broadcastAddress != null)
+        {
+            broadcastSocketAddress = new InetSocketAddress(broadcastAddress, rpcPort != null ? rpcPort : 0);
+        }
 
         InetAddress rpcAddress = null;
         if (peersRow.getColumnDefinitions().contains("rpc_address"))
@@ -392,18 +409,15 @@ class ControlConnection implements Connection.Owner {
             rpcAddress = peersRow.getInet("native_address");
         }
 
-        Integer rpcPort = null;
-        if (peersRow.getColumnDefinitions().contains("rpc_port"))
+        InetSocketAddress rpcSocketAddress = null;
+        if (rpcAddress != null)
         {
-            rpcPort = peersRow.getInt("rpc_port");
-        } else if (peersRow.getColumnDefinitions().contains("native_port"))
-        {
-            rpcPort = peersRow.getInt("native_port");
+            rpcSocketAddress = new InetSocketAddress(rpcAddress, rpcPort);
         }
 
         if (broadcastAddress == null) {
             return null;
-        } else if (broadcastAddress.equals(connectedHost.getAddress()) || (rpcAddress != null && rpcAddress.equals(connectedHost.getAddress()))) {
+        } else if (broadcastSocketAddress.equals(connectedHost) || (rpcSocketAddress != null && rpcSocketAddress.equals(connectedHost))) {
             // Some DSE versions were inserting a line for the local node in peers (with mostly null values). This has been fixed, but if we
             // detect that's the case, ignore it as it's not really a big deal.
             logger.debug("System.peers on node {} has a line for itself. This is not normal but is a known problem of some DSE version. Ignoring the entry.", connectedHost);
