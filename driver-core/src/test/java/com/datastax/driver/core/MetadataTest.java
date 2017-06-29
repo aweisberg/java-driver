@@ -20,8 +20,7 @@ import com.datastax.driver.core.policies.WhiteListPolicy;
 import com.datastax.driver.core.utils.CassandraVersion;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.junit.Test;
-
+import org.testng.annotations.Test;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Map;
